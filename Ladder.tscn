@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://Scenes/Ladder.gd" type="Script" id=2]
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 32, 91.0697 )
+
+[sub_resource type="OccluderPolygon2D" id=5]
+polygon = PoolVector2Array( -31.4402, 94.7408, -31.3921, -130.149, 30.3181, -130.298, 30.0488, 95.2393, 29.0779, -129.256, -30.0527, -129.206 )
+
+[node name="Ladder" type="Area2D"]
+show_behind_parent = true
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="."]
+modulate = Color( 0.223529, 0.129412, 0.0156863, 1 )
+texture = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 4 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+occluder = SubResource( 5 )
+
+[connection signal="body_entered" from="." to="." method="_on_Ladder_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_Ladder_body_exited"]

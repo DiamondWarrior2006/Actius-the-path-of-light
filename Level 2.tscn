@@ -1,0 +1,2679 @@
+[gd_scene load_steps=47 format=2]
+
+[ext_resource path="res://Sprites/Actias/Beginning/BG_LEVEL2_GRASSMIDDLE_1.png" type="Texture" id=1]
+[ext_resource path="res://Scenes/Suraci.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/Level 2.gd" type="Script" id=3]
+[ext_resource path="res://Sprites/Actias/Beginning/BG_LEVEL2_GRASSFRONT_1.png" type="Texture" id=4]
+[ext_resource path="res://Sprites/Actias/Beginning/BG_LEVEL2_BUSH.png" type="Texture" id=5]
+[ext_resource path="res://Sprites/Actias/Beginning/BG_LEVEL2_GRASSBACK_1.png" type="Texture" id=6]
+[ext_resource path="res://Sprites/Actias/BG_LEVEL2_SKY.png" type="Texture" id=7]
+[ext_resource path="res://Sprites/Actias/BG_LEVEL2_GROUND.png" type="Texture" id=8]
+[ext_resource path="res://Sprites/Actias/Filler scenes/BG_LEVEL2_GRASSBACK_T1.png" type="Texture" id=9]
+[ext_resource path="res://Sprites/Actias/Middle/Assests_LVL2_HILLS_1.png" type="Texture" id=10]
+[ext_resource path="res://Sprites/Actias/Middle/Assests_LVL2_CLOUDS.png" type="Texture" id=11]
+[ext_resource path="res://Sprites/Actias/Filler scenes/Small_Assets_LVL2_GRASS_TRANSITION_1.png" type="Texture" id=12]
+[ext_resource path="res://Sprites/Actias/Middle/Assests_LVL2_HILLS_2.png" type="Texture" id=13]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_STREET_LIGHT_1.png" type="Texture" id=14]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_STREET_LIGHT_2.png" type="Texture" id=15]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_FLOWERS_1.png" type="Texture" id=16]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_FLOWER_2.png" type="Texture" id=17]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_FLOWER_3.png" type="Texture" id=18]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_FLOWER_4.png" type="Texture" id=19]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_WHEAT_1.png" type="Texture" id=20]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_GRASS_3.png" type="Texture" id=21]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_GRASS_1.png" type="Texture" id=22]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_GRASS_2.png" type="Texture" id=23]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_TUNNEL.png" type="Texture" id=24]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_GROUND.png" type="Texture" id=25]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_MOUSE.png" type="Texture" id=26]
+[ext_resource path="res://Sprites/Actias/End/BG_LEVEL2_SEWER_BACK.png" type="Texture" id=27]
+[ext_resource path="res://Sprites/Actias/Middle/Small_Assets_LVL2_WHEAT_2.png" type="Texture" id=28]
+[ext_resource path="res://Scenes/StickPlatform.tscn" type="PackedScene" id=29]
+[ext_resource path="res://Scenes/Ui.tscn" type="PackedScene" id=30]
+[ext_resource path="res://Scenes/Candle.tscn" type="PackedScene" id=31]
+[ext_resource path="res://Scenes/MatchPlatform.tscn" type="PackedScene" id=32]
+[ext_resource path="res://Sprites/Actias/PLATFORM_ORANGE.png" type="Texture" id=33]
+[ext_resource path="res://Wind.tres" type="Material" id=34]
+[ext_resource path="res://back grass.tres" type="Material" id=35]
+[ext_resource path="res://Scenes/Spikes.gd" type="Script" id=36]
+[ext_resource path="res://Sprites/Small_Assets_LVL2_GLASS_SPIKES.png" type="Texture" id=37]
+[ext_resource path="res://Sounds/water driping.mp3" type="AudioStream" id=38]
+[ext_resource path="res://Scenes/Platform2.tscn" type="PackedScene" id=39]
+[ext_resource path="res://Scenes/Checkpoint.tscn" type="PackedScene" id=40]
+
+[sub_resource type="Shader" id=8]
+code = "// original wind shader from https://github.com/Maujoe/godot-simple-wind-shader-2d/tree/master/assets/maujoe.simple_wind_shader_2d
+// original script modified by HungryProton so that the assets are moving differently : https://pastebin.com/VL3AfV8D
+//
+// speed - The speed of the wind movement.
+// minStrength - The minimal strength of the wind movement.
+// maxStrength - The maximal strength of the wind movement.
+// strengthScale - Scalefactor for the wind strength.
+// interval - The time between minimal and maximal strength changes.
+// detail - The detail (number of waves) of the wind movement.
+// distortion - The strength of geometry distortion.
+// heightOffset - The height where the wind begins to move. By default 0.0.
+
+shader_type canvas_item;
+render_mode blend_mix;
+
+// Wind settings.
+uniform float speed = 1.0;
+uniform float minStrength : hint_range(0.0, 1.0) = 0.05;
+uniform float maxStrength : hint_range(0.0, 1.0) = 0.01;
+uniform float strengthScale = 100.0;
+uniform float interval = 3.5;
+uniform float detail = 1.0;
+uniform float distortion : hint_range(0.0, 1.0);
+uniform float heightOffset : hint_range(0.0, 1.0);
+
+// With the offset value, you can if you want different moves for each asset. Just put a random value (1, 2, 3) in the editor. Don't forget to mark the material as unique if you use this
+uniform float offset = 0; 
+
+
+float getWind(vec2 vertex, vec2 uv, float time){
+    float diff = pow(maxStrength - minStrength, 2.0);
+    float strength = clamp(minStrength + diff + sin(time / interval) * diff, minStrength, maxStrength) * strengthScale;
+    float wind = (sin(time) + cos(time * detail)) * strength * max(0.0, (1.0-uv.y) - heightOffset);
+    
+    return wind; 
+}
+
+void vertex() {
+    vec4 pos = WORLD_MATRIX * vec4(0.0, 0.0, 0.0, 1.0);
+    float time = TIME * speed + offset;
+    //float time = TIME * speed + pos.x * pos.y  ; not working when moving...
+    VERTEX.x += getWind(VERTEX.xy, UV, time);
+}"
+
+[sub_resource type="ShaderMaterial" id=9]
+shader = SubResource( 8 )
+shader_param/speed = 1.773
+shader_param/minStrength = 0.094
+shader_param/maxStrength = 0.059
+shader_param/strengthScale = 100.0
+shader_param/interval = 3.5
+shader_param/detail = 1.0
+shader_param/distortion = 0.264
+shader_param/heightOffset = 0.264
+shader_param/offset = 0.0
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 9809.93, 14.4321 )
+
+[sub_resource type="OccluderPolygon2D" id=4]
+polygon = PoolVector2Array( 2.91222, 590.557, 3.50574, 562.996, 11345.2, 563.581, 11345.2, 593.581 )
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 20.2985, 300.113 )
+
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 316.073, 273.181 )
+
+[node name="Level 2" type="Node2D"]
+light_mask = 0
+script = ExtResource( 3 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+layer = -2
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.01, 1 )
+motion_mirroring = Vector2( 1496, 0 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+show_behind_parent = true
+position = Vector2( -15.7147, -6.10469 )
+texture = ExtResource( 7 )
+centered = false
+
+[node name="CanvasModulate" type="CanvasModulate" parent="ParallaxBackground/ParallaxLayer"]
+color = Color( 0.435294, 0.435294, 0.435294, 1 )
+
+[node name="ParallaxLayer8" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.6, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer8"]
+position = Vector2( 1580.41, -6.59495 )
+texture = ExtResource( 11 )
+centered = false
+offset = Vector2( 2182, 0 )
+
+[node name="ParallaxLayer10" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.75, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer10"]
+position = Vector2( 4103.74, 40.7049 )
+texture = ExtResource( 14 )
+centered = false
+offset = Vector2( 2182, 0 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer10"]
+position = Vector2( 2307.9, 6.60884 )
+texture = ExtResource( 13 )
+centered = false
+offset = Vector2( 2182, 0 )
+
+[node name="ParallaxLayer9" type="ParallaxLayer" parent="ParallaxBackground"]
+visible = false
+motion_scale = Vector2( 0.7, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer9"]
+position = Vector2( 1635.37, 145.947 )
+texture = ExtResource( 15 )
+centered = false
+offset = Vector2( 2182, 0 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer9"]
+position = Vector2( 944.435, 6.60884 )
+texture = ExtResource( 10 )
+centered = false
+offset = Vector2( 2182, 0 )
+
+[node name="ParallaxLayer7" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.6, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( -22.9325, -4.19947 )
+scale = Vector2( 1.00126, 1 )
+texture = ExtResource( 9 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite3" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 5984.65, -5.50989 )
+texture = ExtResource( 9 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite6" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 4497.72, -5.50989 )
+texture = ExtResource( 9 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite4" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 7337.71, -5.50989 )
+scale = Vector2( 1.09439, 1 )
+texture = ExtResource( 9 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite5" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 10608.3, -5.50989 )
+texture = ExtResource( 22 )
+centered = false
+
+[node name="Sprite8" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 4349.05, -24.6358 )
+texture = ExtResource( 12 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer7"]
+material = ExtResource( 35 )
+position = Vector2( 1342.6, -4.19947 )
+texture = ExtResource( 12 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="ParallaxLayer14" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.7, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite6" type="Sprite" parent="ParallaxBackground/ParallaxLayer14"]
+position = Vector2( 12297, -5.27855 )
+scale = Vector2( 1.09101, 1 )
+texture = ExtResource( 27 )
+centered = false
+
+[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.6, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+material = ExtResource( 35 )
+position = Vector2( -19.1527, -6.53406 )
+texture = ExtResource( 6 )
+centered = false
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+material = ExtResource( 35 )
+position = Vector2( -1515.15, -6.53406 )
+texture = ExtResource( 6 )
+centered = false
+
+[node name="ParallaxLayer3" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.8, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( -16.6586, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( -16.6586, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite3" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( -16.6586, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite4" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 4491.43, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite5" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 5995.78, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite6" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 11178.9, -6.58771 )
+scale = Vector2( 1, 1.00852 )
+texture = ExtResource( 23 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite7" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 7491.78, -6.35681 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite8" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 9021.72, -5.57749 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite9" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+material = ExtResource( 34 )
+position = Vector2( 9796.26, -5.57749 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="ParallaxLayer13" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.85, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer13"]
+position = Vector2( 15260.8, 1.07826 )
+texture = ExtResource( 26 )
+centered = false
+
+[node name="ParallaxLayer4" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.9, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( -15.7147, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( -15.7147, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite3" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( -15.7147, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite4" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 4326.86, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite7" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 5831.21, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite6" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 13222.5, -4.72632 )
+scale = Vector2( 1, 1.01406 )
+texture = ExtResource( 21 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite8" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 7327.21, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite9" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 8823.21, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite10" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 10319.2, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite11" type="Sprite" parent="ParallaxBackground/ParallaxLayer4"]
+material = SubResource( 9 )
+position = Vector2( 11789.7, -6.746 )
+texture = ExtResource( 4 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="ParallaxLayer15" type="ParallaxLayer" parent="ParallaxBackground"]
+position = Vector2( 0, -6.35681 )
+motion_scale = Vector2( 0.85, 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite7" type="Sprite" parent="ParallaxBackground/ParallaxLayer15"]
+position = Vector2( 15245.3, -5.35742 )
+scale = Vector2( 1.02016, 1.01354 )
+texture = ExtResource( 24 )
+centered = false
+
+[node name="ParallaxLayer5" type="ParallaxLayer" parent="ParallaxBackground"]
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer5"]
+position = Vector2( -20.2045, -6.73477 )
+texture = ExtResource( 5 )
+centered = false
+offset = Vector2( -504, 0 )
+
+[node name="ParallaxLayer6" type="ParallaxLayer" parent="ParallaxBackground"]
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+
+[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 1496, 0 )
+
+[node name="Sprite3" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite4" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 4488, 0 )
+
+[node name="Sprite5" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 5984, 0 )
+
+[node name="Sprite6" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 7480, 0 )
+
+[node name="Sprite7" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 8976, 0 )
+
+[node name="Sprite9" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 10472, 0 )
+
+[node name="Sprite10" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 11968, 0 )
+
+[node name="Sprite11" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 13464, 0 )
+
+[node name="Sprite12" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 14960, 0 )
+
+[node name="Sprite13" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( -15.2637, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 16456, 0 )
+
+[node name="Sprite14" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( 746.536, -3.46068 )
+texture = ExtResource( 8 )
+centered = false
+offset = Vector2( 16456, 0 )
+
+[node name="Sprite8" type="Sprite" parent="ParallaxBackground/ParallaxLayer6"]
+position = Vector2( 9149.57, -3.46068 )
+texture = ExtResource( 25 )
+centered = false
+offset = Vector2( 8976, 0 )
+
+[node name="Suraci" parent="." instance=ExtResource( 2 )]
+position = Vector2( 166.77, 439.815 )
+
+[node name="Camera2D" type="Camera2D" parent="Suraci"]
+current = true
+process_mode = 0
+limit_left = 0
+limit_top = -5
+limit_right = 19615
+limit_bottom = 587
+limit_smoothed = true
+smoothing_enabled = true
+smoothing_speed = 10.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Ui" parent="CanvasLayer" instance=ExtResource( 30 )]
+
+[node name="Flowers" type="Node2D" parent="."]
+
+[node name="Sprite2" type="Sprite" parent="Flowers"]
+position = Vector2( 5410.27, 292.523 )
+texture = ExtResource( 28 )
+
+[node name="Sprite4" type="Sprite" parent="Flowers"]
+position = Vector2( 2494.66, -4.45196 )
+texture = ExtResource( 16 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite12" type="Sprite" parent="Flowers"]
+position = Vector2( 3212.86, -0.182495 )
+texture = ExtResource( 16 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite5" type="Sprite" parent="Flowers"]
+position = Vector2( 5025.22, 6.52073 )
+texture = ExtResource( 16 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite6" type="Sprite" parent="Flowers"]
+position = Vector2( 3899.98, -0.182495 )
+texture = ExtResource( 16 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite8" type="Sprite" parent="Flowers"]
+position = Vector2( 4631.98, 3.36107 )
+texture = ExtResource( 17 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite9" type="Sprite" parent="Flowers"]
+position = Vector2( 4261.26, 2.28281 )
+texture = ExtResource( 17 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite10" type="Sprite" parent="Flowers"]
+position = Vector2( 3532.73, 3.36107 )
+texture = ExtResource( 17 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite13" type="Sprite" parent="Flowers"]
+position = Vector2( 2829.55, -2.20704 )
+texture = ExtResource( 17 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite14" type="Sprite" parent="Flowers"]
+position = Vector2( 3758.34, 6.52073 )
+texture = ExtResource( 18 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite15" type="Sprite" parent="Flowers"]
+position = Vector2( 2694.49, -6.73477 )
+texture = ExtResource( 18 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite16" type="Sprite" parent="Flowers"]
+position = Vector2( 3049.36, 3.85989 )
+texture = ExtResource( 18 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite17" type="Sprite" parent="Flowers"]
+position = Vector2( 3431.46, 6.52073 )
+texture = ExtResource( 18 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite19" type="Sprite" parent="Flowers"]
+position = Vector2( 4108.26, 3.36107 )
+texture = ExtResource( 18 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite18" type="Sprite" parent="Flowers"]
+position = Vector2( 4863.69, 9.04624 )
+texture = ExtResource( 19 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite21" type="Sprite" parent="Flowers"]
+position = Vector2( 4488.69, 6.52073 )
+texture = ExtResource( 19 )
+centered = false
+offset = Vector2( 2992, 0 )
+
+[node name="Sprite" type="Sprite" parent="Flowers"]
+position = Vector2( 8370.05, 300.526 )
+texture = ExtResource( 20 )
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="StickPlatform" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 1007.56, 427.216 )
+rotation = -0.523598
+
+[node name="StickPlatform2" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 1467.02, 305.995 )
+
+[node name="StickPlatform3" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 2003.67, 193.065 )
+rotation = 0.380772
+
+[node name="StickPlatform4" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 2199.03, 427.917 )
+rotation = -0.523598
+
+[node name="StickPlatform5" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 3316.68, 357.543 )
+
+[node name="StickPlatform6" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 3870.77, 296.322 )
+rotation = -0.261799
+
+[node name="StickPlatform7" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 4396.52, 241.401 )
+
+[node name="StickPlatform8" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 4926.94, 312.601 )
+rotation = 0.261799
+
+[node name="StickPlatform9" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 9216.67, 415.987 )
+rotation = -0.261799
+
+[node name="StickPlatform11" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 10461.2, 266.08 )
+rotation = -0.261799
+
+[node name="StickPlatform10" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 9813.46, 342.448 )
+
+[node name="StickPlatform12" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 11023.1, 201.169 )
+
+[node name="StickPlatform13" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 15920.1, 378.388 )
+rotation = -0.261799
+
+[node name="StickPlatform14" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 16634.3, 311.365 )
+
+[node name="StickPlatform15" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 17609.8, 311.365 )
+
+[node name="StickPlatform16" parent="Platforms" instance=ExtResource( 29 )]
+position = Vector2( 18255.9, 393.389 )
+rotation = 0.261799
+
+[node name="MatchPlatform" parent="Platforms" instance=ExtResource( 32 )]
+position = Vector2( 2554.24, 253.762 )
+
+[node name="Sprite2" type="Sprite" parent="Platforms/MatchPlatform"]
+show_behind_parent = true
+position = Vector2( 6.03052, -284.828 )
+texture = ExtResource( 33 )
+
+[node name="MatchPlatform2" parent="Platforms" instance=ExtResource( 32 )]
+position = Vector2( 12127.5, 328.677 )
+
+[node name="Sprite2" type="Sprite" parent="Platforms/MatchPlatform2"]
+show_behind_parent = true
+position = Vector2( 6.03052, -284.828 )
+texture = ExtResource( 33 )
+
+[node name="MatchPlatform3" parent="Platforms" instance=ExtResource( 32 )]
+position = Vector2( 17119.9, 226.792 )
+
+[node name="LeafPlatform" parent="Platforms" instance=ExtResource( 39 )]
+position = Vector2( 12942, 496.396 )
+
+[node name="LeafPlatform2" parent="Platforms" instance=ExtResource( 39 )]
+position = Vector2( 13850.2, 491.351 )
+
+[node name="LeafPlatform3" parent="Platforms" instance=ExtResource( 39 )]
+position = Vector2( 14818.9, 498.078 )
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Walls"]
+position = Vector2( -4.62842, 4.23792 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/StaticBody2D"]
+position = Vector2( 9819.35, 573.1 )
+shape = SubResource( 3 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/StaticBody2D"]
+visible = false
+position = Vector2( 0, 2.52551 )
+occluder = SubResource( 4 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Walls"]
+position = Vector2( -8.97968, -4.48985 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/StaticBody2D2"]
+position = Vector2( -10.2985, 290.113 )
+shape = SubResource( 5 )
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="Walls"]
+position = Vector2( 19652.6, -3.69615 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/StaticBody2D3"]
+position = Vector2( -10.2985, 290.113 )
+shape = SubResource( 5 )
+
+[node name="Matches" type="Node2D" parent="."]
+show_behind_parent = true
+
+[node name="Candle" parent="Matches" instance=ExtResource( 31 )]
+position = Vector2( 1467.96, 305.473 )
+
+[node name="Candle2" parent="Matches" instance=ExtResource( 31 )]
+position = Vector2( 1270.53, 531.778 )
+
+[node name="Candle3" parent="Matches" instance=ExtResource( 31 )]
+position = Vector2( 4398.73, 242.529 )
+
+[node name="Candle4" parent="Matches" instance=ExtResource( 31 )]
+position = Vector2( 4265.2, 532.848 )
+
+[node name="Candle5" parent="Matches" instance=ExtResource( 31 )]
+position = Vector2( 13843.3, 420.388 )
+
+[node name="Spikes" type="Node2D" parent="."]
+
+[node name="Spikes" type="Area2D" parent="Spikes"]
+position = Vector2( 2751.56, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes2" type="Area2D" parent="Spikes"]
+position = Vector2( 2856.21, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes2"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes2"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes3" type="Area2D" parent="Spikes"]
+position = Vector2( 2958.03, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes3"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes3"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes4" type="Area2D" parent="Spikes"]
+position = Vector2( 2653.98, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes4"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes4"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes5" type="Area2D" parent="Spikes"]
+position = Vector2( 2552.15, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes5"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes5"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes6" type="Area2D" parent="Spikes"]
+position = Vector2( 2450.33, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes6"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes6"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes7" type="Area2D" parent="Spikes"]
+position = Vector2( 2349.92, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes7"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes7"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes109" type="Area2D" parent="Spikes"]
+position = Vector2( 2252.34, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes109"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes109"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes8" type="Area2D" parent="Spikes"]
+position = Vector2( 3059.85, 469.172 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes8"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes8"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes9" type="Area2D" parent="Spikes"]
+position = Vector2( 3162.09, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes9"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes9"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes10" type="Area2D" parent="Spikes"]
+position = Vector2( 3266.74, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes10"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes10"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes11" type="Area2D" parent="Spikes"]
+position = Vector2( 3368.57, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes11"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes11"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes12" type="Area2D" parent="Spikes"]
+position = Vector2( 3470.39, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes12"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes12"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes13" type="Area2D" parent="Spikes"]
+position = Vector2( 3570.67, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes13"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes13"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes14" type="Area2D" parent="Spikes"]
+position = Vector2( 3672.49, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes14"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes14"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes15" type="Area2D" parent="Spikes"]
+position = Vector2( 3774.32, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes15"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes15"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes16" type="Area2D" parent="Spikes"]
+position = Vector2( 9233.98, 467.673 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes16"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes16"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes17" type="Area2D" parent="Spikes"]
+position = Vector2( 9334.38, 464.844 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes17"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes17"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes18" type="Area2D" parent="Spikes"]
+position = Vector2( 9431.26, 466.259 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes18"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes18"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes19" type="Area2D" parent="Spikes"]
+position = Vector2( 9530.96, 464.137 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes19"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes19"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes20" type="Area2D" parent="Spikes"]
+position = Vector2( 9631.37, 461.309 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes20"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes20"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes21" type="Area2D" parent="Spikes"]
+position = Vector2( 9728.24, 462.723 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes21"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes21"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes22" type="Area2D" parent="Spikes"]
+position = Vector2( 9828.81, 463.252 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes22"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes22"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes23" type="Area2D" parent="Spikes"]
+position = Vector2( 9929.21, 460.424 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes23"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes23"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes24" type="Area2D" parent="Spikes"]
+position = Vector2( 10026.1, 462.505 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes24"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes24"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes25" type="Area2D" parent="Spikes"]
+position = Vector2( 10125.8, 462.386 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes25"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes25"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes26" type="Area2D" parent="Spikes"]
+position = Vector2( 10225.5, 462.895 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes26"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes26"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes27" type="Area2D" parent="Spikes"]
+position = Vector2( 10323.1, 461.452 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes27"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes27"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes28" type="Area2D" parent="Spikes"]
+position = Vector2( 10424.1, 462.542 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes28"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes28"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes29" type="Area2D" parent="Spikes"]
+position = Vector2( 10525.7, 460.343 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes29"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes29"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes30" type="Area2D" parent="Spikes"]
+position = Vector2( 10623.2, 461.758 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes30"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes30"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes31" type="Area2D" parent="Spikes"]
+position = Vector2( 10723.6, 461.526 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes31"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes31"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes32" type="Area2D" parent="Spikes"]
+position = Vector2( 10822.7, 461.848 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes32"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes32"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes33" type="Area2D" parent="Spikes"]
+position = Vector2( 10920.2, 461.821 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes33"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes33"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes34" type="Area2D" parent="Spikes"]
+position = Vector2( 11023.1, 460.176 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes34"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes34"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes35" type="Area2D" parent="Spikes"]
+position = Vector2( 11123, 462.967 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes35"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes35"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes36" type="Area2D" parent="Spikes"]
+position = Vector2( 11219.9, 464.381 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes36"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes36"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes37" type="Area2D" parent="Spikes"]
+position = Vector2( 11320.5, 461.418 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes37"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes37"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes38" type="Area2D" parent="Spikes"]
+position = Vector2( 11420.9, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes38"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes38"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes39" type="Area2D" parent="Spikes"]
+position = Vector2( 11517.7, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes39"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes39"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes40" type="Area2D" parent="Spikes"]
+position = Vector2( 11612.5, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes40"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes40"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes41" type="Area2D" parent="Spikes"]
+position = Vector2( 11711.7, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes41"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes41"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes42" type="Area2D" parent="Spikes"]
+position = Vector2( 11809.4, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes42"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes42"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes43" type="Area2D" parent="Spikes"]
+position = Vector2( 11908.2, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes43"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes43"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes44" type="Area2D" parent="Spikes"]
+position = Vector2( 12009.5, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes44"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes44"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes45" type="Area2D" parent="Spikes"]
+position = Vector2( 12111.6, 461.758 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes45"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes45"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes46" type="Area2D" parent="Spikes"]
+position = Vector2( 12212, 461.526 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes46"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes46"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes47" type="Area2D" parent="Spikes"]
+position = Vector2( 12311.1, 461.848 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes47"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes47"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes48" type="Area2D" parent="Spikes"]
+position = Vector2( 12408.6, 461.821 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes48"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes48"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes49" type="Area2D" parent="Spikes"]
+position = Vector2( 12511.5, 460.176 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes49"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes49"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes50" type="Area2D" parent="Spikes"]
+position = Vector2( 12611.4, 462.967 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes50"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes50"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes51" type="Area2D" parent="Spikes"]
+position = Vector2( 12708.3, 464.381 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes51"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes51"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes52" type="Area2D" parent="Spikes"]
+position = Vector2( 12808.9, 461.418 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes52"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes52"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes53" type="Area2D" parent="Spikes"]
+position = Vector2( 12909.3, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes53"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes53"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes54" type="Area2D" parent="Spikes"]
+position = Vector2( 13006.1, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes54"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes54"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes55" type="Area2D" parent="Spikes"]
+position = Vector2( 13100.9, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes55"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes55"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes56" type="Area2D" parent="Spikes"]
+position = Vector2( 13200.1, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes56"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes56"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes57" type="Area2D" parent="Spikes"]
+position = Vector2( 13297.8, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes57"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes57"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes58" type="Area2D" parent="Spikes"]
+position = Vector2( 13396.6, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes58"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes58"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes59" type="Area2D" parent="Spikes"]
+position = Vector2( 13497.9, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes59"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes59"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes60" type="Area2D" parent="Spikes"]
+position = Vector2( 13596.6, 461.758 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes60"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes60"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes61" type="Area2D" parent="Spikes"]
+position = Vector2( 13697, 461.526 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes61"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes61"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes62" type="Area2D" parent="Spikes"]
+position = Vector2( 13796.1, 461.848 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes62"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes62"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes63" type="Area2D" parent="Spikes"]
+position = Vector2( 13893.6, 461.821 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes63"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes63"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes64" type="Area2D" parent="Spikes"]
+position = Vector2( 13996.5, 460.176 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes64"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes64"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes65" type="Area2D" parent="Spikes"]
+position = Vector2( 14096.4, 462.967 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes65"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes65"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes66" type="Area2D" parent="Spikes"]
+position = Vector2( 14193.3, 464.381 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes66"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes66"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes67" type="Area2D" parent="Spikes"]
+position = Vector2( 14293.9, 461.418 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes67"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes67"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes68" type="Area2D" parent="Spikes"]
+position = Vector2( 14394.3, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes68"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes68"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes69" type="Area2D" parent="Spikes"]
+position = Vector2( 14491.1, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes69"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes69"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes70" type="Area2D" parent="Spikes"]
+position = Vector2( 14585.9, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes70"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes70"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes71" type="Area2D" parent="Spikes"]
+position = Vector2( 14685.1, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes71"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes71"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes72" type="Area2D" parent="Spikes"]
+position = Vector2( 14782.8, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes72"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes72"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes73" type="Area2D" parent="Spikes"]
+position = Vector2( 14881.6, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes73"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes73"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes74" type="Area2D" parent="Spikes"]
+position = Vector2( 14982.9, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes74"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes74"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes75" type="Area2D" parent="Spikes"]
+position = Vector2( 15099.6, 461.758 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes75"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes75"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes76" type="Area2D" parent="Spikes"]
+position = Vector2( 15200, 461.526 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes76"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes76"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes77" type="Area2D" parent="Spikes"]
+position = Vector2( 15299.1, 461.848 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes77"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes77"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes78" type="Area2D" parent="Spikes"]
+position = Vector2( 15396.6, 461.821 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes78"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes78"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes79" type="Area2D" parent="Spikes"]
+position = Vector2( 15499.5, 460.176 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes79"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes79"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes80" type="Area2D" parent="Spikes"]
+position = Vector2( 15599.4, 462.967 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes80"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes80"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes81" type="Area2D" parent="Spikes"]
+position = Vector2( 15696.3, 464.381 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes81"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes81"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes82" type="Area2D" parent="Spikes"]
+position = Vector2( 15796.9, 461.418 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes82"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes82"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes83" type="Area2D" parent="Spikes"]
+position = Vector2( 15897.3, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes83"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes83"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes84" type="Area2D" parent="Spikes"]
+position = Vector2( 15994.1, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes84"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes84"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes85" type="Area2D" parent="Spikes"]
+position = Vector2( 16088.9, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes85"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes85"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes86" type="Area2D" parent="Spikes"]
+position = Vector2( 16188.1, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes86"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes86"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes87" type="Area2D" parent="Spikes"]
+position = Vector2( 16285.8, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes87"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes87"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes88" type="Area2D" parent="Spikes"]
+position = Vector2( 16384.6, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes88"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes88"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes89" type="Area2D" parent="Spikes"]
+position = Vector2( 16485.9, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes89"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes89"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes90" type="Area2D" parent="Spikes"]
+position = Vector2( 16592, 461.821 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes90"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes90"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes91" type="Area2D" parent="Spikes"]
+position = Vector2( 16694.9, 460.176 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes91"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes91"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes92" type="Area2D" parent="Spikes"]
+position = Vector2( 16794.8, 462.967 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes92"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes92"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes93" type="Area2D" parent="Spikes"]
+position = Vector2( 16891.7, 464.381 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes93"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes93"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes94" type="Area2D" parent="Spikes"]
+position = Vector2( 16992.3, 461.418 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes94"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes94"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes95" type="Area2D" parent="Spikes"]
+position = Vector2( 17092.7, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes95"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes95"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes96" type="Area2D" parent="Spikes"]
+position = Vector2( 17189.5, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes96"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes96"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes97" type="Area2D" parent="Spikes"]
+position = Vector2( 17284.3, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes97"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes97"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes98" type="Area2D" parent="Spikes"]
+position = Vector2( 17383.5, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes98"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes98"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes99" type="Area2D" parent="Spikes"]
+position = Vector2( 17481.2, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes99"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes99"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes100" type="Area2D" parent="Spikes"]
+position = Vector2( 17580, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes100"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes100"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes101" type="Area2D" parent="Spikes"]
+position = Vector2( 17681.3, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes101"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes101"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes102" type="Area2D" parent="Spikes"]
+position = Vector2( 17783.2, 462.795 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes102"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes102"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes103" type="Area2D" parent="Spikes"]
+position = Vector2( 17880, 464.209 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes103"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes103"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes104" type="Area2D" parent="Spikes"]
+position = Vector2( 17974.8, 461.827 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes104"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes104"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes105" type="Area2D" parent="Spikes"]
+position = Vector2( 18074, 463.217 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes105"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes105"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes106" type="Area2D" parent="Spikes"]
+position = Vector2( 18171.7, 463.74 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes106"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes106"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes107" type="Area2D" parent="Spikes"]
+position = Vector2( 18270.5, 463.45 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes107"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes107"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="Spikes108" type="Area2D" parent="Spikes"]
+position = Vector2( 18371.8, 462.154 )
+script = ExtResource( 36 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Spikes/Spikes108"]
+position = Vector2( -8.46848e-05, -4.00002 )
+scale = Vector2( 0.358209, 0.364865 )
+texture = ExtResource( 37 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Spikes/Spikes108"]
+visible = false
+polygon = PoolVector2Array( -47.562, 92.4496, -45.783, 86.831, -42.2244, 90.764, -38.104, 92.7305, -31.4553, 94.978, -32.6726, 89.6403, -30.8933, 82.617, -26.9604, 88.0483, -24.9939, 89.0784, -25.7429, 83.6471, -14.5938, 92.5938, -17.0342, 87.2992, -16.6594, 76.6238, -11.6963, 85.239, -10.7188, 89.75, 5.81519, 70.9114, 8.5625, 91.875, 9.65454, 87.9547, 11.9956, 82.2424, 15.9287, 88.142, 22.2813, 92.5625, 21.2664, 88.6102, 20.8916, 76.4365, 27.0723, 85.8009, 28.1563, 90.1875, 35.4077, 88.2357, 40.0625, 94.4375, 41.1189, 90.0149, 43.0854, 84.6772, 47.7676, 88.7975, 41.7744, 97.7874, 16.7712, 100.69, -11.2283, 100.69, -36.4185, 99.2857 )
+
+[node name="MusicTimer" type="Timer" parent="."]
+wait_time = 0.7
+one_shot = true
+
+[node name="Ending" type="Area2D" parent="."]
+position = Vector2( 19371.8, 276.239 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ending"]
+position = Vector2( -74.4238, 2.31775 )
+shape = SubResource( 10 )
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Ending"]
+stream = ExtResource( 38 )
+volume_db = -10.0
+bus = "SFX"
+
+[node name="Timer" type="Timer" parent="Ending"]
+
+[node name="Checkpoint" parent="." instance=ExtResource( 40 )]
+position = Vector2( 8704.13, 487.652 )
+
+[connection signal="health_updated" from="Suraci" to="." method="_on_Suraci_health_updated"]
+[connection signal="body_entered" from="Spikes/Spikes" to="Spikes/Spikes" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes2" to="Spikes/Spikes2" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes3" to="Spikes/Spikes3" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes4" to="Spikes/Spikes4" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes5" to="Spikes/Spikes5" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes6" to="Spikes/Spikes6" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes7" to="Spikes/Spikes7" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes109" to="Spikes/Spikes109" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes8" to="Spikes/Spikes8" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes9" to="Spikes/Spikes9" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes10" to="Spikes/Spikes10" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes11" to="Spikes/Spikes11" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes12" to="Spikes/Spikes12" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes13" to="Spikes/Spikes13" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes14" to="Spikes/Spikes14" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes15" to="Spikes/Spikes15" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes16" to="Spikes/Spikes16" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes17" to="Spikes/Spikes17" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes18" to="Spikes/Spikes18" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes19" to="Spikes/Spikes19" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes20" to="Spikes/Spikes20" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes21" to="Spikes/Spikes21" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes22" to="Spikes/Spikes22" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes23" to="Spikes/Spikes23" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes24" to="Spikes/Spikes24" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes25" to="Spikes/Spikes25" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes26" to="Spikes/Spikes26" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes27" to="Spikes/Spikes27" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes28" to="Spikes/Spikes28" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes29" to="Spikes/Spikes29" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes30" to="Spikes/Spikes30" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes31" to="Spikes/Spikes31" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes32" to="Spikes/Spikes32" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes33" to="Spikes/Spikes33" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes34" to="Spikes/Spikes34" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes35" to="Spikes/Spikes35" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes36" to="Spikes/Spikes36" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes37" to="Spikes/Spikes37" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes38" to="Spikes/Spikes38" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes39" to="Spikes/Spikes39" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes40" to="Spikes/Spikes40" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes41" to="Spikes/Spikes41" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes42" to="Spikes/Spikes42" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes43" to="Spikes/Spikes43" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes44" to="Spikes/Spikes44" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes45" to="Spikes/Spikes45" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes46" to="Spikes/Spikes46" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes47" to="Spikes/Spikes47" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes48" to="Spikes/Spikes48" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes49" to="Spikes/Spikes49" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes50" to="Spikes/Spikes50" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes51" to="Spikes/Spikes51" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes52" to="Spikes/Spikes52" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes53" to="Spikes/Spikes53" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes54" to="Spikes/Spikes54" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes55" to="Spikes/Spikes55" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes56" to="Spikes/Spikes56" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes57" to="Spikes/Spikes57" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes58" to="Spikes/Spikes58" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes59" to="Spikes/Spikes59" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes60" to="Spikes/Spikes60" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes61" to="Spikes/Spikes61" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes62" to="Spikes/Spikes62" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes63" to="Spikes/Spikes63" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes64" to="Spikes/Spikes64" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes65" to="Spikes/Spikes65" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes66" to="Spikes/Spikes66" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes67" to="Spikes/Spikes67" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes68" to="Spikes/Spikes68" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes69" to="Spikes/Spikes69" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes70" to="Spikes/Spikes70" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes71" to="Spikes/Spikes71" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes72" to="Spikes/Spikes72" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes73" to="Spikes/Spikes73" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes74" to="Spikes/Spikes74" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes75" to="Spikes/Spikes75" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes76" to="Spikes/Spikes76" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes77" to="Spikes/Spikes77" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes78" to="Spikes/Spikes78" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes79" to="Spikes/Spikes79" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes80" to="Spikes/Spikes80" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes81" to="Spikes/Spikes81" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes82" to="Spikes/Spikes82" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes83" to="Spikes/Spikes83" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes84" to="Spikes/Spikes84" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes85" to="Spikes/Spikes85" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes86" to="Spikes/Spikes86" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes87" to="Spikes/Spikes87" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes88" to="Spikes/Spikes88" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes89" to="Spikes/Spikes89" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes90" to="Spikes/Spikes90" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes91" to="Spikes/Spikes91" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes92" to="Spikes/Spikes92" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes93" to="Spikes/Spikes93" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes94" to="Spikes/Spikes94" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes95" to="Spikes/Spikes95" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes96" to="Spikes/Spikes96" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes97" to="Spikes/Spikes97" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes98" to="Spikes/Spikes98" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes99" to="Spikes/Spikes99" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes100" to="Spikes/Spikes100" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes101" to="Spikes/Spikes101" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes102" to="Spikes/Spikes102" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes103" to="Spikes/Spikes103" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes104" to="Spikes/Spikes104" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes105" to="Spikes/Spikes105" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes106" to="Spikes/Spikes106" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes107" to="Spikes/Spikes107" method="_on_Spikes_body_entered"]
+[connection signal="body_entered" from="Spikes/Spikes108" to="Spikes/Spikes108" method="_on_Spikes_body_entered"]
+[connection signal="timeout" from="MusicTimer" to="." method="_on_MusicTimer_timeout"]
+[connection signal="body_entered" from="Ending" to="." method="_on_Sound_body_entered"]
+[connection signal="body_exited" from="Ending" to="." method="_on_Ending_body_exited"]
+[connection signal="timeout" from="Ending/Timer" to="." method="_on_Timer_timeout"]

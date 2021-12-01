@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/LightAMatchWAV.wav-98440a8ba326ab87e4f10a72782c91cd.sample"
+
+[deps]
+
+source_file="res://Sounds/LightAMatchWAV.wav"
+dest_files=[ "res://.import/LightAMatchWAV.wav-98440a8ba326ab87e4f10a72782c91cd.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

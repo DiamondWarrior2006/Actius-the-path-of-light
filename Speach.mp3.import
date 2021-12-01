@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Speach.mp3-e97b44dd971a903b2df793b7ac3012a4.mp3str"
+
+[deps]
+
+source_file="res://Sounds/Speach.mp3"
+dest_files=[ "res://.import/Speach.mp3-e97b44dd971a903b2df793b7ac3012a4.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

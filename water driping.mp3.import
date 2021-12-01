@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/water driping.mp3-ddfbe849d5580c65b411f128b576aa69.mp3str"
+
+[deps]
+
+source_file="res://Sounds/water driping.mp3"
+dest_files=[ "res://.import/water driping.mp3-ddfbe849d5580c65b411f128b576aa69.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
